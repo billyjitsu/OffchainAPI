@@ -5,8 +5,8 @@ const { decode } = require ('@api3/airnode-abi');
 const params = [
    { type: 'string', name: 'part', value: 'statistics' }, 
    { type: 'string', name: 'id', value: 'Jfk6-lZUUvQ' }, 
-    { type: 'string', name: '_path', value: 'items.0.statistics.viewCount' },
-    { type: 'string', name: '_type', value: 'int256' }
+   { type: 'string', name: '_path', value: 'items.0.statistics.viewCount' },
+   { type: 'string', name: '_type', value: 'int256' }
 ];
 
 const encodedData = encode(params);

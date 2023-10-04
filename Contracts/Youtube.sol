@@ -85,7 +85,8 @@ contract Youtube is RrpRequesterV0, Ownable {
 
     //Require all bets be at least 20 dollars in USD Value depending on price of ETH
     function placeBet(Range _betRange) public payable {
-
+        // There is no timestamp to stop last minute bets
+        require(_betRange >= Range.OneTo100 && _betRange <= Range.Ten001AndBeyond, "Invalid bet range");
         (uint256 price, ) = readDataFeed();
         // Convert the amount being paid (in wei) to its equivalent in USD (in wei format)
         uint256 amountInUSDWei = (msg.value * price) / 1e18;
