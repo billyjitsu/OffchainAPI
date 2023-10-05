@@ -20,9 +20,6 @@ contract Youtube is RrpRequesterV0, Ownable {
     uint256 public returnedResponse;
 
     mapping(bytes32 => bool) public incomingFulfillments;
-    mapping(bytes32 => int256) public fulfilledData;
-    mapping(address => bool) public winners;
-
 
     // Creating a range for users to bet within scope
     enum Range { OneTo100, Hundred1To1000, Thousand1To5000, Five001To10000, Ten001AndBeyond }
@@ -42,7 +39,7 @@ contract Youtube is RrpRequesterV0, Ownable {
         proxyAddress = _proxyAddress;
     }
 
-    // Setup Airnod Parameters
+    // Setup Airnode Parameters
     function setRequestParameters(
         address _airnode,
         bytes32 _endpointId,
@@ -70,6 +67,8 @@ contract Youtube is RrpRequesterV0, Ownable {
         emit RequestedUint256(requestId);
     }
 
+    // This is the response from the Airnode request
+    // It should return with a number of youtube views for that video
     function fulfill(bytes32 requestId, bytes calldata data)
         external
         onlyAirnodeRrp
@@ -77,7 +76,6 @@ contract Youtube is RrpRequesterV0, Ownable {
         require(incomingFulfillments[requestId], "No such request made");
         delete incomingFulfillments[requestId];
         int256 decodedData = abi.decode(data, (int256));
-        //fulfilledData[requestId] = decodedData;
         returnedResponse = uint256(decodedData);
         executeBets(returnedResponse);
         emit ReceivedUint256(requestId, decodedData);
@@ -85,9 +83,12 @@ contract Youtube is RrpRequesterV0, Ownable {
 
     //Require all bets be at least 20 dollars in USD Value depending on price of ETH
     function placeBet(Range _betRange) public payable {
-        // There is no timestamp to stop last minute bets
+        /* Note - There is no timestamp to stop last minute bets
+           For production, we want to ensure that there is a time system to ensure 
+           that time is given for betters and a grace period is set before execution */
         require(_betRange >= Range.OneTo100 && _betRange <= Range.Ten001AndBeyond, "Invalid bet range");
         (uint256 price, ) = readDataFeed();
+
         // Convert the amount being paid (in wei) to its equivalent in USD (in wei format)
         uint256 amountInUSDWei = (msg.value * price) / 1e18;
         // Convert the USD amount in wei format to a regular USD amount
@@ -101,7 +102,7 @@ contract Youtube is RrpRequesterV0, Ownable {
         bets.push(newBet);
     }
 
-    function executeBets(uint256 number) public {
+    function executeBets(uint256 number) internal {
         Range winningRange;
         if (number >= 1 && number <= 100) {
             winningRange = Range.OneTo100;

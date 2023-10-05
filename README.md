@@ -81,7 +81,7 @@ node .\src\encodeParams.js
 ```
 ## Deploying the Requester
 
-- Compile and Deploy the ```Youtube.sol``` contract on Remix. Select the ```_rrpAddress``` from [here](https://docs.api3.org/reference/airnode/latest/).
+- Compile and Deploy the ```Youtube.sol``` contract on Remix. Select the ```_rrpAddress``` from [here](https://docs.api3.org/reference/airnode/latest/).  
 
 - Derive your ```sponsorWallet``` address using the Airnode CLI.
 
@@ -107,4 +107,12 @@ Fund the ```sponsorWallet``` with some test Arbitrum Goerli ETH
 - Pass in your ```airnode```, ```endpointID```, ```sponsor``` (The Requester contract itself), ```sponsorWallet``` (derived from the Airnode CLI) and ```parameters``` to call the ```makeRequest``` function.
 
 - Check the latest transaction from the ```sponsorWallet``` and go to its logs. The requested data will be encoded in ```bytes32```.
-- You can get the ```requestId``` from the transaction logs and then pass it through the ```fulfilledData``` function to get the decoded output.
+- You can get the ```returnedResponse``` from the public variables to get the decoded output.
+
+# Part 3 - Setting up the Prediction Game
+
+- You can get the ```ETH/USD``` price feed from the API3 Marketplace [here](https://market.api3.org/dapis). Once you pick the PriceFeed of choice, make sure to copy the Proxy Contract Address and set it in the ```setProxyAddress``` function.  
+
+- There is an ENUM range of 0-4 positions ```1-100, 101-1000, 1001-5000, 5001-10_000, 10_001-Infinite ```When placing a bet, the user must choose between a value of 0 through 4 and send a msg.value higher thatn $20 usd value ```hard coded``` into the contract.
+
+- Once all bets are placed ```Note: there is no time grace periods coded to stop the automatic executionon the request, due to demo time ``` the ```makeRequest``` function can be called with the ```parameters``` that were encoded to request the current count of views on the specific youtube ID.  Once the request is fulfilled, it will go through the list of entrys and distribute the funds to the winners.
